@@ -1,12 +1,23 @@
 <template>
-  <h1 class="logo-text glitch" data-text="DATABASED">DATABASED</h1>
+  <h1 class="logo-text" v-bind:class="{glitch: isAnimating}" data-text="DATABASED">DATABASED</h1>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "LogoText",
+  setup() {
+    let isAnimating = ref(true);
+    
+    setTimeout(function() {
+      isAnimating.value = false;
+    }, 10000);
+
+    return {
+      isAnimating
+    }
+  }
 });
 </script>
 
