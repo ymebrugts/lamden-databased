@@ -1,67 +1,35 @@
 <template>
   <div class="calculator">
     <label for="select-asset">Select Asset</label>
-    <select 
-      name="select-asset" 
-      id="select-asset"
-      v-model="selectedToken">
+    <select name="select-asset" id="select-asset" v-model="selectedToken">
       <option disabled value="" class="default">Select an asset</option>
-      <option 
-        v-for="(amount, token) in assets" 
-        :key="token" 
-        :value="token">{{formatNumber(amount)}} <span class="token-name">{{token.toUpperCase()}}</span>
+      <option v-for="(amount, token) in assets" :key="token" :value="token">
+        {{ formatNumber(amount) }} <span class="token-name">{{ token.toUpperCase() }}</span>
       </option>
     </select>
 
     <label for="price">Select Price</label>
     <div class="number-input price">
-      <input 
-        type="number"
-        step="any"
-        id="select-price"
-        v-model="selectedUnitPrice"
-        @blur="inputUnitPriceActive = false" 
-        @focus="inputUnitPriceActive = true">
-      <div 
-        class="number-formatted"
-        v-if="!inputUnitPriceActive">
+      <input type="number" step="any" id="select-price" v-model="selectedUnitPrice" @blur="inputUnitPriceActive = false" @focus="inputUnitPriceActive = true" />
+      <div class="number-formatted" v-if="!inputUnitPriceActive">
         {{ formattedUnitPrice }}
       </div>
-      <button 
-        title="Randomize"
-        v-on:click="fillRandomUnitPrice()"></button>
+      <button title="Randomize" v-on:click="fillRandomUnitPrice()"></button>
     </div>
 
     <label for="market-cap">Market Cap</label>
     <div class="number-input price">
-      <input 
-        type="number"
-        step="any"
-        id="market-cap" 
-        v-model="selectedMarketCap"
-        @blur="inputMarketCapActive = false" 
-        @focus="inputMarketCapActive = true">
-      <div 
-        class="number-formatted"
-        v-if="!inputMarketCapActive">
+      <input type="number" step="any" id="market-cap" v-model="selectedMarketCap" @blur="inputMarketCapActive = false" @focus="inputMarketCapActive = true" />
+      <div class="number-formatted" v-if="!inputMarketCapActive">
         {{ formattedMarketCap }}
       </div>
-      <button 
-        title="Randomize"
-        v-on:click="fillRandomMarketCap()"></button>
+      <button title="Randomize" v-on:click="fillRandomMarketCap()"></button>
     </div>
-    
+
     <label for="circulating-supply">Circulating Supply</label>
     <div class="number-input">
-      <input 
-        type="text" 
-        id="circulating-supply" 
-        v-model="selectedCirculatingSupply"
-        @blur="inputCirculatingSupplyActive = false" 
-        @focus="inputCirculatingSupplyActive = true">
-      <div 
-        class="number-formatted"
-        v-if="!inputCirculatingSupplyActive">
+      <input type="text" id="circulating-supply" v-model="selectedCirculatingSupply" @blur="inputCirculatingSupplyActive = false" @focus="inputCirculatingSupplyActive = true" />
+      <div class="number-formatted" v-if="!inputCirculatingSupplyActive">
         {{ formattedCirculatingSupply }}
       </div>
     </div>
@@ -71,15 +39,13 @@
     <p class="result">{{ formattedResult }}</p>
 
     <div class="error" v-if="error">
-      <div class="error-text">
-        Connect a wallet with at least 25,000 BASED.
-      </div>
+      <div class="error-text">Connect a wallet with at least 25,000 BASED.</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from "vue";
+import { defineComponent, ref, computed, watch, onMounted } from "vue";
 
 export default defineComponent({
   name: "Calculator",
@@ -88,14 +54,14 @@ export default defineComponent({
     const bounds = {
       unitprice: {
         lower: 0.01,
-        upper: 5
+        upper: 5,
       },
       marketcap: {
         lower: 100000,
-        upper: 50000000
-      }
+        upper: 50000000,
+      },
     };
-    const assets: {[key: string]: number} = {
+    const assets: { [key: string]: number } = {
       tau: 5161123,
       rswp: 512361,
       wp: 845638,
@@ -104,7 +70,7 @@ export default defineComponent({
       gvrn: 2572,
       ldoge: 23450,
       based: 1783590,
-      luck: 43563
+      luck: 43563,
     };
 
     let inputUnitPriceActive = ref(false);
@@ -122,14 +88,14 @@ export default defineComponent({
         options = {
           minimumFractionDigits: 0,
           maximumFractionDigits: 0,
-        }
+        };
       } else {
         options = {
           minimumFractionDigits: 2,
-          maximumFractionDigits: decimals
-        }
+          maximumFractionDigits: decimals,
+        };
       }
-      return new Intl.NumberFormat('en-US', options).format(number);
+      return new Intl.NumberFormat("en-US", options).format(number);
     }
 
     function fillRandomUnitPrice(): void {
@@ -153,11 +119,11 @@ export default defineComponent({
       }
     }
 
-    watch(selectedMarketCap, (marketCap: number, prevMarketCap: number) => { 
+    watch(selectedMarketCap, (marketCap: number, prevMarketCap: number) => {
       updateUnitPrice();
     });
 
-    watch(selectedCirculatingSupply, (circulatingSupply: number, prevCirculatingSupply: number) => { 
+    watch(selectedCirculatingSupply, (circulatingSupply: number, prevCirculatingSupply: number) => {
       updateUnitPrice();
     });
 
@@ -175,8 +141,9 @@ export default defineComponent({
 
     const formattedResult = computed(() => {
       let result = selectedUnitPrice.value * assets[selectedToken.value];
-      return '$' + (isNaN(result) ? 0 : formatNumber(result, 2));
+      return "$" + (isNaN(result) ? 0 : formatNumber(result, 2));
     });
+
 
     return {
       error,
@@ -196,9 +163,10 @@ export default defineComponent({
       formattedMarketCap,
       formattedCirculatingSupply,
       formattedResult,
-      result
-    }
-  }
+      result,
+
+    };
+  },
 });
 </script>
 
@@ -214,7 +182,8 @@ export default defineComponent({
   position: relative;
 }
 
-input, select {
+input,
+select {
   padding: 10px;
   background: #e0e0e0;
   border: 1px solid #aeafad;
@@ -229,7 +198,7 @@ input, select {
 
 #select-asset {
   appearance: none;
-  background-image: url('../assets/accordion.svg');
+  background-image: url("../assets/accordion.svg");
   background-repeat: no-repeat;
   background-position: 97%;
   cursor: pointer;
@@ -248,9 +217,9 @@ input, select {
   position: relative;
   font-weight: bold;
 
-  &.price{
+  &.price {
     &::before {
-      content: '$';
+      content: "$";
       display: block;
       position: absolute;
       color: #000;
@@ -285,7 +254,7 @@ input, select {
 
   button {
     position: absolute;
-    background-image: url('../assets/shuffle.svg');
+    background-image: url("../assets/shuffle.svg");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 60%;
@@ -328,7 +297,7 @@ label {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: rgb(0,0,0,0.8);
+  background-color: rgb(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
