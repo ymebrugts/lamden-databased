@@ -147,11 +147,22 @@ export default defineComponent({
     }
 
     function updateUnitPrice(): void {
-      if (selectedCirculatingSupply.value > 0 && selectedMarketCap.value > 0) {
+      if (selectedCirculatingSupply.value > 0 && selectedMarketCap.value > 0 && !inputUnitPriceActive.value) {
         let unitPrice = selectedMarketCap.value / selectedCirculatingSupply.value;
         selectedUnitPrice.value = unitPrice;
       }
     }
+
+    function updateMarketCap(): void {
+      if (selectedCirculatingSupply.value > 0 && selectedUnitPrice.value > 0 && !inputMarketCapActive.value) {
+        let marketCap = selectedUnitPrice.value * selectedCirculatingSupply.value;
+        selectedMarketCap.value = marketCap;
+      }
+    }
+
+    watch(selectedUnitPrice, (unitPrice: number, prevUnitPrice: number) => { 
+      updateMarketCap();
+    });
 
     watch(selectedMarketCap, (marketCap: number, prevMarketCap: number) => { 
       updateUnitPrice();
@@ -159,6 +170,7 @@ export default defineComponent({
 
     watch(selectedCirculatingSupply, (circulatingSupply: number, prevCirculatingSupply: number) => { 
       updateUnitPrice();
+      updateMarketCap();
     });
 
     const formattedUnitPrice = computed(() => {
@@ -166,7 +178,7 @@ export default defineComponent({
     });
 
     const formattedMarketCap = computed(() => {
-      return formatNumber(selectedMarketCap.value);
+      return formatNumber(selectedMarketCap.value, 2);
     });
 
     const formattedCirculatingSupply = computed(() => {
