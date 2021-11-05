@@ -119,9 +119,6 @@ export default defineComponent({
       }
     }
 
-<<<<<<< HEAD
-    watch(selectedMarketCap, (marketCap: number, prevMarketCap: number) => {
-=======
     function updateMarketCap(): void {
       if (selectedCirculatingSupply.value > 0 && selectedUnitPrice.value > 0 && !inputMarketCapActive.value) {
         let marketCap = selectedUnitPrice.value * selectedCirculatingSupply.value;
@@ -134,7 +131,6 @@ export default defineComponent({
     });
 
     watch(selectedMarketCap, (marketCap: number, prevMarketCap: number) => { 
->>>>>>> b09035443294fa9d3a38b8c92a7453b9791bd7ee
       updateUnitPrice();
     });
 
