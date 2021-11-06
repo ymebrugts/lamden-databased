@@ -2,14 +2,14 @@
   <div class="background-transition-databased"></div>
   <div class="wrapper">
     <header class="header">
-      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName !== 'con_nebula'" @click="connectToWallet">
+      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== connectionRequest.contractName" @click="connectToWallet">
         CONNECT LAMDEN WALLET
       </button>
       <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="button" v-if="walletIsInstalled === false"
         >WALLET NOT INSTALLED</a
       >
       <button class="button" v-if="walletController.locked === true">WALLET IS LOCKED</button>
-      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName === 'con_nebula'">CONNECTED</button>
+      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === connectionRequest.contractName">CONNECTED</button>
     </header>
     <img alt="Databased logo" src="../assets/logo.png" class="logo" />
     <LogoText />
@@ -25,11 +25,11 @@
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <h2 class="slogan" v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName === 'con_nebula'">
+    <h2 class="slogan" v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === connectionRequest.contractName">
       You don't hold enough BASED you need to hold at least 10.000 BASED
     </h2>
-    <h2  class="slogan" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName !== 'con_nebula'">
-      Connect to wallet to verify at least 10.000 BASED holdings
+    <h2  class="slogan" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== connectionRequest.contractName">
+      Connect to wallet to verify you hold at least 10.000 BASED
     </h2>
     <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="subheading" v-if="walletIsInstalled === false"
       >Install wallet first</a
@@ -71,8 +71,8 @@ const connectionRequest = {
   appName: "Databased", // Your DAPPS's name
   version: "1.0.0", // any version to start, increment later versions to update connection info
   logo: "/src/assets/databased.png", // or whatever the location of your logo
-  contractName: "con_nebula", // Will never change
-  networkType: "testnet", // other option is 'mainnet'
+  contractName: "con_databased", // Will never change
+  networkType: "mainnet", // other option is 'mainnet'
 };
 
 const supportedCurrencies: any = {
@@ -149,12 +149,14 @@ export default defineComponent({
         walletController.walletIsInstalled().then((installed: boolean) => {
           if (installed) walletIsInstalled.value = true;
           else walletIsInstalled.value = false;
+          
         });
       }, 1000);
     });
 
     async function handleWalletInfoDatabased(walletInfo: any) {
       updateWalletBalances(walletInfo);
+      console.log(walletInfo);
     }
 
     const walletBalances = ref<any>();
@@ -176,9 +178,6 @@ export default defineComponent({
         // get data from rocketswap
         const { data: balances }: any = await rocketSwapApi.getBalances(walletInfo.wallets[0]);
         walletBalances.value = balances.balances;
-        console.log("value:");
-        console.log(walletBalances.value["con_databased"]);
-        console.log(parseInt(walletBalances.value["con_databased"]));
         checkBased(parseInt(walletBalances.value["con_databased"]));
         currenciesToShow.value = {};
         for (const tokenContractInWallet in walletBalances.value) {
@@ -283,7 +282,7 @@ export default defineComponent({
 
     function handleTxResultsDatabased(txInfo: any) {}
 
-    return { walletConnected, walletIsInstalled, connectToWallet, walletController, currenciesToShow, marketTokens, supportedCurrencies, tauPrice, circulatingSupplies, enoughBased };
+    return { walletConnected, walletIsInstalled, connectToWallet, walletController, currenciesToShow, marketTokens, supportedCurrencies, tauPrice, circulatingSupplies, enoughBased, connectionRequest };
   },
 });
 </script>

@@ -141,8 +141,6 @@ export default defineComponent({
     }
 
     function randomNumber(lower: number, upper: number): number {
-      console.log("lower: " + lower);
-      console.log("upper: " + upper);
       return Math.random() * (upper - lower) + lower;
     }
 
@@ -164,7 +162,6 @@ export default defineComponent({
       if (selectedCirculatingSupply.value > 0 && selectedUnitPrice.value > 0 && !inputMarketCapActive.value) {
         let marketCap = selectedUnitPrice.value * selectedCirculatingSupply.value;
         staticSelectedMarketCap.value = marketCap;
-        console.log("here" + staticSelectedMarketCap.value);
       }
     }
 
@@ -206,7 +203,6 @@ export default defineComponent({
     }
 
     function tokenSelected(token: any) {
-      console.log("fired");
       const tokenTicker = token.target.value;
       if (tokenTicker === "TAU") {
         staticSelectedUnitPrice.value = props.tauPrice;
