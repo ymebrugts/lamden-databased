@@ -254,6 +254,7 @@ select {
   position: relative;
   appearance: none;
   font-family: Poppins;
+  font-weight:400;
 }
 
 input {
@@ -289,10 +290,14 @@ input {
       height: 100%;
       position: absolute;
       align-items: center;
+      justify-content: center;
+      text-align:center;
       color: #000;
+      font-family: Poppins;
+      font-weight:400;
       z-index: 1;
-     
       left: 10px;
+      transform: translateY(1px);
     }
 
     input {
@@ -316,7 +321,8 @@ input {
     overflow: hidden;
     font-size: 1rem;
     font-weight: bold;
-    font-family: Poppins,
+    font-family: Poppins;
+    font-weight: 400;
   }
 
 
@@ -357,6 +363,7 @@ label {
 .result {
   color: white;
   font-size: 2.5rem;
+  font-family: Poppins;
 }
 
 .error {
