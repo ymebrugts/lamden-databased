@@ -253,7 +253,12 @@ select {
   font-weight: bold;
   position: relative;
   appearance: none;
-  font-family: sans-serif;
+  font-family: Poppins;
+}
+
+input {
+    padding-top:11px;
+  padding-bottom:9px;
 }
 
 #select-asset {
@@ -280,13 +285,14 @@ select {
   &.price {
     &::before {
       content: "$";
-      display: block;
+      display: flex;
+      height: 100%;
       position: absolute;
+      align-items: center;
       color: #000;
       z-index: 1;
-      top: 50%;
+     
       left: 10px;
-      transform: translateY(-50%);
     }
 
     input {
@@ -310,7 +316,9 @@ select {
     overflow: hidden;
     font-size: 1rem;
     font-weight: bold;
+    font-family: Poppins,
   }
+
 
   button {
     position: absolute;

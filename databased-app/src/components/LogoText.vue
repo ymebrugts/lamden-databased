@@ -29,6 +29,7 @@ export default defineComponent({
   line-height: 2.7rem;
   color: #fff;
   margin-bottom: 12px;
+  z-index:3;
 }
 .glitch {
   position: relative;

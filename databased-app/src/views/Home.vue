@@ -1,4 +1,5 @@
 <template>
+  <div class="background-transition-databased"></div>
   <div class="wrapper">
     <header class="header">
       <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName !== 'con_nebula'" @click="connectToWallet">
@@ -13,14 +14,34 @@
     <img alt="Databased logo" src="../assets/logo.png" class="logo" />
     <LogoText />
     <p class="subtitle"><span>BASED</span> is a community currency built on Lamden.</p>
-    <p class="slogan">BUY | STAKE | FARM</p>
+
+    <p class="slogan">
+      <a href="https://rocketswap.exchange/#/swap/con_databased" class="link-databased" target="_blank">BUY</a> |
+      <a href="https://nebulamden.finance/" class="link-databased" target="_blank">STAKE</a> | TIP | RAIN
+    </p>
     <h2 class="subheading">
       What will your assets <br class="break" />
       be worth?<span>*</span>
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <Calculator :assets-prop="currenciesToShow" :market-tokens="marketTokens" :supported-currencies="supportedCurrencies" :tau-price="tauPrice" :circulating-supplies="circulatingSupplies" />
+    <h2 v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName === 'con_nebula'">
+      You don't hold enough BASED you have to buy at least 10.000 BASED
+    </h2>
+    <h2 v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName !== 'con_nebula'">
+      Connect to wallet to verify at least 10.000 BASED holdings
+    </h2>
+    <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="subheading" v-if="walletIsInstalled === false"
+      >Install wallet first</a
+    >
+    <Calculator
+      :enough-based="enoughBased"
+      :assets-prop="currenciesToShow"
+      :market-tokens="marketTokens"
+      :supported-currencies="supportedCurrencies"
+      :tau-price="tauPrice"
+      :circulating-supplies="circulatingSupplies"
+    />
 
     <footer>
       <p class="slogan">LOCKED LP | NO TEAM TOKENS</p>
@@ -254,13 +275,38 @@ export default defineComponent({
 });
 </script>
 
+<style lang="scss">
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--purple) black;
+  scrollbar-width: none;
+  scrollbar-gutter: 0;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: black;
+  display: none;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background-color: var(--purple);
+  display: none;
+}
+</style>
+
 <style lang="scss" scoped>
 .wrapper {
   width: 100%;
   max-width: 625px;
   margin: 0 auto;
   text-align: center;
-  font-family: sans-serif;
+  font-family: Roboto;
   padding: 10px;
   font-size: 0.98rem;
 }
@@ -312,6 +358,12 @@ p {
   color: var(--purple);
   font-size: 1.2rem;
   margin: 30px 0;
+  text-decoration: none;
+}
+
+.link-databased {
+  text-decoration: none;
+  color: var(--purple);
 }
 
 .subheading {
@@ -340,6 +392,30 @@ footer {
       text-transform: uppercase;
       text-decoration: underline;
     }
+  }
+}
+
+.background-transition-databased {
+  background-color: black;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.background-transition-databased {
+  animation: 2s cubic-bezier(0.45, 0, 0.55, 1) 2s 1 forwards opacityAnimation;
+}
+
+@keyframes opacityAnimation {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
