@@ -20,7 +20,7 @@
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <Calculator :currencies-to-show="currenciesToShow" />
+    <Calculator :assets-prop="currenciesToShow" />
 
     <footer>
       <p class="slogan">LOCKED LP | NO TEAM TOKENS</p>
