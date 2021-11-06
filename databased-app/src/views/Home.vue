@@ -1,8 +1,12 @@
 <template>
   <div class="wrapper">
     <header class="header">
-      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName !== 'con_nebula'" @click="connectToWallet">CONNECT LAMDEN WALLET</button>
-      <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="button" v-if="walletIsInstalled === false">WALLET NOT INSTALLED</a>
+      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName !== 'con_nebula'" @click="connectToWallet">
+        CONNECT LAMDEN WALLET
+      </button>
+      <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="button" v-if="walletIsInstalled === false"
+        >WALLET NOT INSTALLED</a
+      >
       <button class="button" v-if="walletController.locked === true">WALLET IS LOCKED</button>
       <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName === 'con_nebula'">CONNECTED</button>
     </header>
@@ -16,7 +20,7 @@
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <Calculator />
+    <Calculator :walletBalances="walletBalances" />
 
     <footer>
       <p class="slogan">LOCKED LP | NO TEAM TOKENS</p>
@@ -35,10 +39,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted, ref } from "vue";
+import { defineComponent, computed, onMounted, ref, watch } from "vue";
 import Calculator from "@/components/Calculator.vue";
 import LogoText from "@/components/LogoText.vue";
 import WalletController from "lamden_wallet_controller";
+import { rocketSwapApi } from "@/api/rocketswapApi";
 
 const connectionRequest = {
   appName: "Databased", // Your DAPPS's name
@@ -55,6 +60,18 @@ const connectionRequest = {
 //   contractName: "con_nebula", // Will never change
 //   networkType: "testnet" // other option is 'mainnet'
 // };
+
+const currencies = {
+  TAU: "currency",
+  RSWP: "con_rswp_lst001",
+  WP: "con_uwarriors_lst001",
+  NEB: "con_nebula",
+  SCD: "con_collider_contract",
+  GVRN: "con_proton_contract",
+  LDOGE: "con_lambdoge",
+  BASED: "con_databased",
+  LUCK: "con_luck_lst001",
+};
 
 export default defineComponent({
   name: "Home",
@@ -83,35 +100,52 @@ export default defineComponent({
       walletIsInstalled.value = await walletController.walletIsInstalled();
       if (!walletIsInstalled.value) {
         //TODO: global snackbar error
-        console.log("wallet is not installed");
+
         return;
       }
-      console.log("trying")
-      
+
       walletController.sendConnection(connectionRequest);
     }
 
     onMounted(async () => {
       setTimeout(() => {
         walletController.walletIsInstalled().then((installed: boolean) => {
-          console.log("installed: " + installed);
           if (installed) walletIsInstalled.value = true;
           else walletIsInstalled.value = false;
         });
       }, 1000);
     });
 
-    
-
-    function handleWalletInfoDatabased(walletInfo: any) {
-      console.log(walletInfo)
+    async function handleWalletInfoDatabased(walletInfo: any) {
+      updateWalletBalances(walletInfo);
     }
 
-    function handleTxResultsDatabased(txInfo: any) {
+    const walletBalances = ref<any>();
+    const currenciesToShow = ref<any>([]);
 
+    function getKeyByValue(object: any, value: any): any {
+      return Object.keys(object).find((key) => object[key] === value);
     }
 
-    return { walletConnected, walletIsInstalled, connectToWallet, walletController };
+    async function updateWalletBalances(walletInfo: any) {
+      if (walletInfo.wallets !== null && walletInfo.wallets !== undefined && walletInfo.wallets[0] !== undefined && walletInfo.wallets[0] !== null && walletInfo.wallets[0] !== "") {
+        const { data: balances }: any = await rocketSwapApi.getBalances(walletInfo.wallets[0]);
+        walletBalances.value = balances.balances;
+        console.log(walletBalances.value);
+        currenciesToShow.value = [];
+        for (const item in walletBalances.value) {
+          if (Object.values(currencies).includes(item)) {
+            console.log(item);
+            currenciesToShow.value.push(getKeyByValue(currencies, item));
+          }
+        }
+        console.log(currenciesToShow.value);
+      }
+    }
+
+    function handleTxResultsDatabased(txInfo: any) {}
+
+    return { walletConnected, walletIsInstalled, connectToWallet, walletController, walletBalances };
   },
 });
 </script>

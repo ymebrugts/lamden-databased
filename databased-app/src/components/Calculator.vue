@@ -3,8 +3,9 @@
     <label for="select-asset">Select Asset</label>
     <select name="select-asset" id="select-asset" v-model="selectedToken">
       <option disabled value="" class="default">Select an asset</option>
-      <option v-for="(amount, token) in assets" :key="token" :value="token">
-        {{ formatNumber(amount) }} <span class="token-name">{{ token.toUpperCase() }}</span>
+      <option v-for="(key) in walletBalances" :key="key" :value="key">
+        <!-- {{ formatNumber(value) }} <span class="token-name">{{ key.toUpperCase() }}</span> -->
+        {{ key }}
       </option>
     </select>
 
@@ -49,7 +50,13 @@ import { defineComponent, ref, computed, watch, onMounted } from "vue";
 
 export default defineComponent({
   name: "Calculator",
-  setup() {
+  props: {
+    walletBalances: {
+      required: true,
+      type: Object
+    }
+  },
+  setup(props) {
     let error = false;
     const bounds = {
       unitprice: {
@@ -155,8 +162,7 @@ export default defineComponent({
       let result = selectedUnitPrice.value * assets[selectedToken.value];
       return "$" + (isNaN(result) ? 0 : formatNumber(result, 2));
     });
-
-
+    
     return {
       error,
       bounds,
