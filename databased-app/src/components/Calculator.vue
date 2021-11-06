@@ -1,7 +1,7 @@
 <template>
   <div class="calculator">
     <label for="select-asset">Select Asset</label>
-    <select name="select-asset" id="select-asset" @change="tokenSelected" v-model="selectedToken">
+    <select name="select-asset" id="select-asset" :disabled="!enoughBased" @change="tokenSelected" v-model="selectedToken">
       <option disabled value="" class="default">Select an asset</option>
       <option v-for="(amount, token) in assets" :key="token" :value="token">
         {{ formatNumber(amount, 2) }} <span class="token-name">{{ token.toUpperCase() }}</span>
@@ -10,7 +10,7 @@
 
     <label for="price">Select Price</label>
     <div class="number-input price">
-      <input type="number" step="any" id="select-price" v-model="selectedUnitPrice" @blur="inputUnitPriceActive = false" @focus="inputUnitPriceActive = true" />
+      <input type="number" step="any" id="select-price" :disabled="!enoughBased" v-model="selectedUnitPrice" @blur="inputUnitPriceActive = false" @focus="inputUnitPriceActive = true" />
       <div class="number-formatted" v-if="!inputUnitPriceActive">
         {{ formattedUnitPrice }}
       </div>
@@ -19,7 +19,7 @@
 
     <label for="market-cap">Market Cap</label>
     <div class="number-input price">
-      <input type="number" step="any" id="market-cap" v-model="selectedMarketCap" @blur="inputMarketCapActive = false" @focus="inputMarketCapActive = true" />
+      <input type="number" step="any" id="market-cap" :disabled="!enoughBased" v-model="selectedMarketCap" @blur="inputMarketCapActive = false" @focus="inputMarketCapActive = true" />
       <div class="number-formatted" v-if="!inputMarketCapActive">
         {{ formattedMarketCap }}
       </div>
@@ -28,7 +28,14 @@
 
     <label for="circulating-supply">Circulating Supply</label>
     <div class="number-input">
-      <input type="text" id="circulating-supply" v-model="selectedCirculatingSupply" @blur="inputCirculatingSupplyActive = false" @focus="inputCirculatingSupplyActive = true" />
+      <input
+        type="text"
+        id="circulating-supply"
+        :disabled="!enoughBased"
+        v-model="selectedCirculatingSupply"
+        @blur="inputCirculatingSupplyActive = false"
+        @focus="inputCirculatingSupplyActive = true"
+      />
       <div class="number-formatted" v-if="!inputCirculatingSupplyActive">
         {{ formattedCirculatingSupply }}
       </div>
@@ -69,6 +76,10 @@ export default defineComponent({
     circulatingSupplies: {
       required: true,
       type: Object,
+    },
+    enoughBased: {
+      required: true,
+      type: Boolean,
     },
   },
   setup(props) {
@@ -114,17 +125,23 @@ export default defineComponent({
     }
 
     function fillRandomUnitPrice(): void {
+      if (props.enoughBased == false) {
+        return;
+      }
       let random: number = randomNumber(staticSelectedUnitPrice.value, bounds.unitprice.upper);
       selectedUnitPrice.value = random;
     }
 
     function fillRandomMarketCap(): void {
+      if (props.enoughBased == false) {
+        return;
+      }
       let random: number = randomNumber(staticSelectedMarketCap.value, bounds.marketcap.upper);
       selectedMarketCap.value = Math.round(random);
     }
 
     function randomNumber(lower: number, upper: number): number {
-      console.log("lower: " + lower)
+      console.log("lower: " + lower);
       console.log("upper: " + upper);
       return Math.random() * (upper - lower) + lower;
     }
@@ -139,7 +156,7 @@ export default defineComponent({
     function updateMarketCap(): void {
       if (selectedCirculatingSupply.value > 0 && selectedUnitPrice.value > 0 && !inputMarketCapActive.value) {
         let marketCap = selectedUnitPrice.value * selectedCirculatingSupply.value;
-        selectedMarketCap.value = marketCap;        
+        selectedMarketCap.value = marketCap;
       }
     }
 
@@ -254,12 +271,12 @@ select {
   position: relative;
   appearance: none;
   font-family: Poppins;
-  font-weight:400;
+  font-weight: 400;
 }
 
 input {
-    padding-top:11px;
-  padding-bottom:9px;
+  padding-top: 11px;
+  padding-bottom: 9px;
 }
 
 #select-asset {
@@ -291,10 +308,10 @@ input {
       position: absolute;
       align-items: center;
       justify-content: center;
-      text-align:center;
+      text-align: center;
       color: #000;
       font-family: Poppins;
-      font-weight:400;
+      font-weight: 400;
       z-index: 1;
       left: 10px;
       transform: translateY(1px);
@@ -324,7 +341,6 @@ input {
     font-family: Poppins;
     font-weight: 400;
   }
-
 
   button {
     position: absolute;

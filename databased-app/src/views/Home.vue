@@ -25,10 +25,10 @@
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <h2 v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName === 'con_nebula'">
-      You don't hold enough BASED you have to buy at least 10.000 BASED
+    <h2 class="slogan" v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName === 'con_nebula'">
+      You don't hold enough BASED you need to hold at least 10.000 BASED
     </h2>
-    <h2 v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName !== 'con_nebula'">
+    <h2  class="slogan" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.testnet?.contractName !== 'con_nebula'">
       Connect to wallet to verify at least 10.000 BASED holdings
     </h2>
     <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="subheading" v-if="walletIsInstalled === false"
@@ -119,7 +119,6 @@ export default defineComponent({
   },
   setup() {
     // Wallet
-
     const walletController = new WalletController();
     // Create event handlers
     const handleWalletInfo = (walletInfo: any) => handleWalletInfoDatabased(walletInfo);
@@ -128,7 +127,7 @@ export default defineComponent({
     walletController.events.on("newInfo", handleWalletInfo); // Wallet Info Events, including errors
     walletController.events.on("txStatus", handleTxResults); // Transaction Results
     const walletIsInstalled = ref<boolean>();
-
+    const enoughBased = ref<boolean>(false);
     const walletConnected = computed(() => {
       const connectionStatus = walletIsInstalled.value;
       return connectionStatus ? "Wallet connected" : "Connect Lamden Wallet";
@@ -160,13 +159,27 @@ export default defineComponent({
 
     const walletBalances = ref<any>();
     const currenciesToShow = ref<any>({});
+    function checkBased(basedAmount: number) {
+      if (basedAmount !== undefined) {
+        if (basedAmount >= 10000) {
+          enoughBased.value = true;
+        } else {
+          enoughBased.value = false;
+        }
+      } else {
+        enoughBased.value = false;
+      }
+    }
     async function updateWalletBalances(walletInfo: any) {
       // if wallet has current connected wallet
       if (walletInfo.wallets !== null && walletInfo.wallets !== undefined && walletInfo.wallets[0] !== undefined && walletInfo.wallets[0] !== null && walletInfo.wallets[0] !== "") {
         // get data from rocketswap
         const { data: balances }: any = await rocketSwapApi.getBalances(walletInfo.wallets[0]);
         walletBalances.value = balances.balances;
-
+        console.log("value:");
+        console.log(walletBalances.value["con_databased"]);
+        console.log(parseInt(walletBalances.value["con_databased"]));
+        checkBased(parseInt(walletBalances.value["con_databased"]));
         currenciesToShow.value = {};
         for (const tokenContractInWallet in walletBalances.value) {
           if (Object.keys(supportedCurrencies).includes(tokenContractInWallet)) {
@@ -270,7 +283,7 @@ export default defineComponent({
 
     function handleTxResultsDatabased(txInfo: any) {}
 
-    return { walletConnected, walletIsInstalled, connectToWallet, walletController, currenciesToShow, marketTokens, supportedCurrencies, tauPrice, circulatingSupplies };
+    return { walletConnected, walletIsInstalled, connectToWallet, walletController, currenciesToShow, marketTokens, supportedCurrencies, tauPrice, circulatingSupplies, enoughBased };
   },
 });
 </script>
@@ -399,7 +412,7 @@ footer {
   background-color: black;
   position: absolute;
   top: 0;
-  bottom: 0;
+  height:100%;
   left: 0;
   right: 0;
   z-index: 3;
