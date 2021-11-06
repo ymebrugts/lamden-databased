@@ -1,14 +1,12 @@
 <template>
   <div class="calculator">
     <label for="select-asset">Select Asset</label>
-    <select v-if="currenciesToShow" name="select-asset" id="select-asset" v-model="selectedToken">
+    <select name="select-asset" id="select-asset" v-model="selectedToken">
       <option disabled value="" class="default">Select an asset</option>
-      <option v-for="(key, value, index) in currenciesToShow" :key="index" :value="key">
-        <!-- {{ formatNumber(value) }} <span class="token-name">{{ key.toUpperCase() }}</span> -->
-        {{ key }} {{ value }} {{currenciesToShow}}
-      </option>
+      <option v-for="(value, key, index) in currenciesToShow" :key="index" :value="value">
+        {{ key }} {{ value }}
+        </option>
     </select>
-
     <label for="price">Select Price</label>
     <div class="number-input price">
       <input type="number" step="any" id="select-price" v-model="selectedUnitPrice" @blur="inputUnitPriceActive = false" @focus="inputUnitPriceActive = true" />
@@ -52,8 +50,12 @@ export default defineComponent({
   name: "Calculator",
   props: {
     currenciesToShow: {
-      required: true,
       type: Object,
+    },
+  },
+  methods: {
+    forceUpdate() {
+      this.$forceUpdate();
     },
   },
   setup(props) {
@@ -79,11 +81,6 @@ export default defineComponent({
       based: 1783590,
       luck: 43563,
     };
-
-    setTimeout(() => {
-      console.log("there it goes grace");
-      console.log(props.currenciesToShow);
-    }, 3000);
 
     let inputUnitPriceActive = ref(false);
     let inputMarketCapActive = ref(false);

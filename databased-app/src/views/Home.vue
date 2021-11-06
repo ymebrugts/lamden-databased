@@ -20,7 +20,7 @@
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <Calculator :currenciesToShow="currenciesToShow" />
+    <Calculator :currencies-to-show="currenciesToShow" />
 
     <footer>
       <p class="slogan">LOCKED LP | NO TEAM TOKENS</p>
@@ -129,13 +129,13 @@ export default defineComponent({
         const { data: balances }: any = await rocketSwapApi.getBalances(walletInfo.wallets[0]);
         walletBalances.value = balances.balances;
         
-        currenciesToShow.value = [];
+        currenciesToShow.value = {};
         for (const item in walletBalances.value) {
           if (Object.keys(currencies).includes(item)) {
             currenciesToShow.value[currencies[item]] = walletBalances.value[item];
           }
-        }
-        console.log(currenciesToShow.value);
+          currenciesToShow.value['TAU'] = 500
+        }        
       }
     }
 
