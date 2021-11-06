@@ -1,11 +1,11 @@
 <template>
   <div class="calculator">
     <label for="select-asset">Select Asset</label>
-    <select name="select-asset" id="select-asset" v-model="selectedToken">
+    <select v-if="currenciesToShow" name="select-asset" id="select-asset" v-model="selectedToken">
       <option disabled value="" class="default">Select an asset</option>
-      <option v-for="(key) in walletBalances" :key="key" :value="key">
+      <option v-for="(key, value, index) in currenciesToShow" :key="index" :value="key">
         <!-- {{ formatNumber(value) }} <span class="token-name">{{ key.toUpperCase() }}</span> -->
-        {{ key }}
+        {{ key }} {{ value }} {{currenciesToShow}}
       </option>
     </select>
 
@@ -51,10 +51,10 @@ import { defineComponent, ref, computed, watch, onMounted } from "vue";
 export default defineComponent({
   name: "Calculator",
   props: {
-    walletBalances: {
+    currenciesToShow: {
       required: true,
-      type: Object
-    }
+      type: Object,
+    },
   },
   setup(props) {
     let error = false;
@@ -79,6 +79,11 @@ export default defineComponent({
       based: 1783590,
       luck: 43563,
     };
+
+    setTimeout(() => {
+      console.log("there it goes grace");
+      console.log(props.currenciesToShow);
+    }, 3000);
 
     let inputUnitPriceActive = ref(false);
     let inputMarketCapActive = ref(false);
@@ -133,11 +138,11 @@ export default defineComponent({
       }
     }
 
-    watch(selectedUnitPrice, (unitPrice: number, prevUnitPrice: number) => { 
+    watch(selectedUnitPrice, (unitPrice: number, prevUnitPrice: number) => {
       updateMarketCap();
     });
 
-    watch(selectedMarketCap, (marketCap: number, prevMarketCap: number) => { 
+    watch(selectedMarketCap, (marketCap: number, prevMarketCap: number) => {
       updateUnitPrice();
     });
 
@@ -162,7 +167,7 @@ export default defineComponent({
       let result = selectedUnitPrice.value * assets[selectedToken.value];
       return "$" + (isNaN(result) ? 0 : formatNumber(result, 2));
     });
-    
+
     return {
       error,
       bounds,
@@ -182,7 +187,6 @@ export default defineComponent({
       formattedCirculatingSupply,
       formattedResult,
       result,
-
     };
   },
 });

@@ -20,7 +20,7 @@
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <Calculator :walletBalances="walletBalances" />
+    <Calculator :currenciesToShow="currenciesToShow" />
 
     <footer>
       <p class="slogan">LOCKED LP | NO TEAM TOKENS</p>
@@ -122,13 +122,10 @@ export default defineComponent({
 
     const walletBalances = ref<any>();
     const currenciesToShow = ref();
-
-    function getKeyByValue(object: any, value: any): any {
-      return Object.keys(object).find((key) => object[key] === value);
-    }
-
     async function updateWalletBalances(walletInfo: any) {
+      // if wallet has current connected wallet
       if (walletInfo.wallets !== null && walletInfo.wallets !== undefined && walletInfo.wallets[0] !== undefined && walletInfo.wallets[0] !== null && walletInfo.wallets[0] !== "") {
+        // get data from rocketswap
         const { data: balances }: any = await rocketSwapApi.getBalances(walletInfo.wallets[0]);
         walletBalances.value = balances.balances;
         
@@ -144,7 +141,7 @@ export default defineComponent({
 
     function handleTxResultsDatabased(txInfo: any) {}
 
-    return { walletConnected, walletIsInstalled, connectToWallet, walletController, walletBalances };
+    return { walletConnected, walletIsInstalled, connectToWallet, walletController, currenciesToShow };
   },
 });
 </script>
