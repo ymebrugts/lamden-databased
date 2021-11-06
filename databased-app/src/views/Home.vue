@@ -61,16 +61,16 @@ const connectionRequest = {
 //   networkType: "testnet" // other option is 'mainnet'
 // };
 
-const currencies = {
-  TAU: "currency",
-  RSWP: "con_rswp_lst001",
-  WP: "con_uwarriors_lst001",
-  NEB: "con_nebula",
-  SCD: "con_collider_contract",
-  GVRN: "con_proton_contract",
-  LDOGE: "con_lambdoge",
-  BASED: "con_databased",
-  LUCK: "con_luck_lst001",
+const currencies: any = {
+  currency: "TAU",
+  con_rswp_lst001: "RSWP",
+  con_uwarriors_lst001: "WP",
+  con_nebula: "NEB",
+  con_collider_contract: "SCD",
+  con_proton_contract: "GVRN",
+  con_lambdoge: "LDOGE",
+  con_databased: "BASED",
+  con_luck_lst001: "LUCK",
 };
 
 export default defineComponent({
@@ -121,7 +121,7 @@ export default defineComponent({
     }
 
     const walletBalances = ref<any>();
-    const currenciesToShow = ref<any>([]);
+    const currenciesToShow = ref();
 
     function getKeyByValue(object: any, value: any): any {
       return Object.keys(object).find((key) => object[key] === value);
@@ -131,12 +131,11 @@ export default defineComponent({
       if (walletInfo.wallets !== null && walletInfo.wallets !== undefined && walletInfo.wallets[0] !== undefined && walletInfo.wallets[0] !== null && walletInfo.wallets[0] !== "") {
         const { data: balances }: any = await rocketSwapApi.getBalances(walletInfo.wallets[0]);
         walletBalances.value = balances.balances;
-        console.log(walletBalances.value);
+        
         currenciesToShow.value = [];
         for (const item in walletBalances.value) {
-          if (Object.values(currencies).includes(item)) {
-            console.log(item);
-            currenciesToShow.value.push(getKeyByValue(currencies, item));
+          if (Object.keys(currencies).includes(item)) {
+            currenciesToShow.value[currencies[item]] = walletBalances.value[item];
           }
         }
         console.log(currenciesToShow.value);
