@@ -73,16 +73,7 @@ export default defineComponent({
   },
   setup(props) {
     let error = false;
-    const bounds = {
-      unitprice: {
-        lower: 0.01,
-        upper: 5,
-      },
-      marketcap: {
-        lower: 100000,
-        upper: 50000000,
-      },
-    };
+
     const assets = computed((): any => props.assetsProp);
 
     let inputUnitPriceActive = ref(false);
@@ -90,9 +81,21 @@ export default defineComponent({
     let inputCirculatingSupplyActive = ref(false);
     let selectedToken = ref("");
     let selectedUnitPrice = ref(0);
+    let staticSelectedUnitPrice = ref(0);
     let selectedMarketCap = ref(0);
+    let staticSelectedMarketCap = ref(0);
     let selectedCirculatingSupply = ref(0);
     let result = ref(0);
+    const bounds = {
+      unitprice: {
+        lower: staticSelectedUnitPrice.value,
+        upper: 200,
+      },
+      marketcap: {
+        lower: staticSelectedMarketCap.value,
+        upper: 50000000,
+      },
+    };
 
     function formatNumber(number: number, decimals = 20): string {
       let options;
@@ -111,16 +114,18 @@ export default defineComponent({
     }
 
     function fillRandomUnitPrice(): void {
-      let random: number = randomNumber(bounds.unitprice.lower, bounds.unitprice.upper);
+      let random: number = randomNumber(staticSelectedUnitPrice.value, bounds.unitprice.upper);
       selectedUnitPrice.value = random;
     }
 
     function fillRandomMarketCap(): void {
-      let random: number = randomNumber(bounds.marketcap.lower, bounds.marketcap.upper);
+      let random: number = randomNumber(staticSelectedMarketCap.value, bounds.marketcap.upper);
       selectedMarketCap.value = Math.round(random);
     }
 
     function randomNumber(lower: number, upper: number): number {
+      console.log("lower: " + lower)
+      console.log("upper: " + upper);
       return Math.random() * (upper - lower) + lower;
     }
 
@@ -134,7 +139,15 @@ export default defineComponent({
     function updateMarketCap(): void {
       if (selectedCirculatingSupply.value > 0 && selectedUnitPrice.value > 0 && !inputMarketCapActive.value) {
         let marketCap = selectedUnitPrice.value * selectedCirculatingSupply.value;
-        selectedMarketCap.value = marketCap;
+        selectedMarketCap.value = marketCap;        
+      }
+    }
+
+    function updateMarketCapStatic(): void {
+      if (selectedCirculatingSupply.value > 0 && selectedUnitPrice.value > 0 && !inputMarketCapActive.value) {
+        let marketCap = selectedUnitPrice.value * selectedCirculatingSupply.value;
+        staticSelectedMarketCap.value = marketCap;
+        console.log("here" + staticSelectedMarketCap.value);
       }
     }
 
@@ -176,18 +189,21 @@ export default defineComponent({
     }
 
     function tokenSelected(token: any) {
+      console.log("fired");
       const tokenTicker = token.target.value;
       if (tokenTicker === "TAU") {
+        staticSelectedUnitPrice.value = props.tauPrice;
         selectedUnitPrice.value = props.tauPrice;
       } else {
         const selectedTokenInfo: any = props.marketTokens.filter((item: any) => item.contract_name === getKeyByValue(props.supportedCurrencies, tokenTicker));
-        selectedUnitPrice.value = Number(selectedTokenInfo[0].Last)*props.tauPrice;
+        const tempPrice = Number(selectedTokenInfo[0].Last) * props.tauPrice;
+        selectedUnitPrice.value = tempPrice;
+        staticSelectedUnitPrice.value = tempPrice;
       }
 
-      selectedCirculatingSupply.value = props.circulatingSupplies[tokenTicker]
+      selectedCirculatingSupply.value = props.circulatingSupplies[tokenTicker];
+      updateMarketCapStatic();
     }
-
-
 
     return {
       error,
