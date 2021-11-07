@@ -70,7 +70,7 @@ import { masternodeApi } from "@/api/masternodeApi";
 const connectionRequest = {
   appName: "Databased", // Your DAPPS's name
   version: "1.0.0", // any version to start, increment later versions to update connection info
-  logo: "img/logo.png", // or whatever the location of your logo
+  logo: "/src/assets/databased.png", // or whatever the location of your logo
   contractName: "con_databased", // Will never change
   networkType: "mainnet", // other option is 'mainnet'
 };
@@ -127,8 +127,13 @@ export default defineComponent({
     walletController.events.on("newInfo", handleWalletInfo); // Wallet Info Events, including errors
     walletController.events.on("txStatus", handleTxResults); // Transaction Results
 
-    const walletIsInstalled = ref();
+    const walletIsInstalled = ref<boolean>();
     const enoughBased = ref<boolean>(false);
+
+    const walletConnected = computed(() => {
+      const connectionStatus = walletIsInstalled.value;
+      return connectionStatus ? "Wallet connected" : "Connect Lamden Wallet";
+    });
 
     async function connectToWallet() {
       console.log("connect to wallet");
@@ -142,27 +147,20 @@ export default defineComponent({
       walletController.sendConnection(connectionRequest);
     }
 
-    onMounted(() => {
+    onMounted(async () => {
       setTimeout(() => {
         walletController.walletIsInstalled().then((installed: boolean) => {
           if (installed) walletIsInstalled.value = true;
           else walletIsInstalled.value = false;
-          console.log("timeout");
-          console.log(installed);
-          console.log(walletIsInstalled.value);
         });
-      }, 2000);
+      }, 1000);
     });
 
     async function handleWalletInfoDatabased(walletInfo: any) {
-      console.log(walletInfo);
-      console.log("here we go");
       if (walletController.locked === null) {
         walletController.locked = false;
       }
-      if (walletInfo?.approvals?.mainnet == "con_databased") {
-        updateWalletBalances(walletInfo);
-      }
+      updateWalletBalances(walletInfo)
     }
 
     const walletBalances = ref<any>();
@@ -289,6 +287,7 @@ export default defineComponent({
     function handleTxResultsDatabased(txInfo: any) {}
 
     return {
+      walletConnected,
       walletIsInstalled,
       connectToWallet,
       walletController,
