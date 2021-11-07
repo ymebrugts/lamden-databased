@@ -131,14 +131,7 @@ export default defineComponent({
     const enoughBased = ref<boolean>(false);
 
     async function connectToWallet() {
-      walletIsInstalled.value = await walletController.walletIsInstalled();
-      if (!walletIsInstalled.value) {
-        //TODO: global snackbar error
-
-        return;
-      }
-
-      walletController.sendConnection(connectionRequest);
+      await walletController.sendConnection(connectionRequest);
     }
 
     onMounted(async () => {
@@ -151,8 +144,12 @@ export default defineComponent({
     });
 
     async function handleWalletInfoDatabased(walletInfo: any) {
-      if (walletController.locked === null) {
+      if (walletController.locked === null) {        
         walletController.locked = false;
+      }
+      if (walletInfo?.errors !== undefined && walletInfo?.errors[0] === "Wallet is Locked") {
+        walletController.locked = false;
+        walletController.locked = true;
       }
       updateWalletBalances(walletInfo);
     }
@@ -278,7 +275,9 @@ export default defineComponent({
     }
     GetCirculatingSupplies();
 
-    function handleTxResultsDatabased(txInfo: any) {}
+    function handleTxResultsDatabased(txInfo: any) {
+
+    }
 
     return {
       walletIsInstalled,
