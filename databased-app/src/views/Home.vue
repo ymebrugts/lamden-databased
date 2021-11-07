@@ -70,7 +70,7 @@ import { masternodeApi } from "@/api/masternodeApi";
 const connectionRequest = {
   appName: "Databased", // Your DAPPS's name
   version: "1.0.0", // any version to start, increment later versions to update connection info
-  logo: "/src/assets/databased.png", // or whatever the location of your logo
+  logo: "img/logo.png", // or whatever the location of your logo
   contractName: "con_databased", // Will never change
   networkType: "mainnet", // other option is 'mainnet'
 };
@@ -129,11 +129,6 @@ export default defineComponent({
 
     const walletIsInstalled = ref<boolean>();
     const enoughBased = ref<boolean>(false);
-
-    const walletConnected = computed(() => {
-      const connectionStatus = walletIsInstalled.value;
-      return connectionStatus ? "Wallet connected" : "Connect Lamden Wallet";
-    });
 
     async function connectToWallet() {
       console.log("connect to wallet");
@@ -287,7 +282,6 @@ export default defineComponent({
     function handleTxResultsDatabased(txInfo: any) {}
 
     return {
-      walletConnected,
       walletIsInstalled,
       connectToWallet,
       walletController,
