@@ -131,7 +131,6 @@ export default defineComponent({
     const enoughBased = ref<boolean>(false);
 
     async function connectToWallet() {
-      console.log("connect to wallet");
       walletIsInstalled.value = await walletController.walletIsInstalled();
       if (!walletIsInstalled.value) {
         //TODO: global snackbar error
