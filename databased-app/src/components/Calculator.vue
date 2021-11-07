@@ -11,7 +11,7 @@
     <label for="price">Select Price</label>
     <div class="number-input price">
       <input type="number" step="any" id="select-price" :disabled="!enoughBased" v-model="selectedUnitPrice" @blur="inputUnitPriceActive = false" @focus="inputUnitPriceActive = true" />
-      <div class="number-formatted" v-if="!inputUnitPriceActive">
+      <div class="number-formatted" v-if="!inputUnitPriceActive && enoughBased">
         {{ formattedUnitPrice }}
       </div>
       <button title="Randomize" v-on:click="fillRandomUnitPrice()"></button>
@@ -20,7 +20,7 @@
     <label for="market-cap">Market Cap</label>
     <div class="number-input price">
       <input type="number" step="any" id="market-cap" :disabled="!enoughBased" v-model="selectedMarketCap" @blur="inputMarketCapActive = false" @focus="inputMarketCapActive = true" />
-      <div class="number-formatted" v-if="!inputMarketCapActive">
+      <div class="number-formatted" v-if="!inputMarketCapActive && enoughBased">
         {{ formattedMarketCap }}
       </div>
       <button title="Randomize" v-on:click="fillRandomMarketCap()"></button>
@@ -36,7 +36,7 @@
         @blur="inputCirculatingSupplyActive = false"
         @focus="inputCirculatingSupplyActive = true"
       />
-      <div class="number-formatted" v-if="!inputCirculatingSupplyActive">
+      <div class="number-formatted" v-if="!inputCirculatingSupplyActive && enoughBased">
         {{ formattedCirculatingSupply }}
       </div>
     </div>
@@ -310,7 +310,8 @@ input {
       font-weight: 400;
       z-index: 1;
       left: 10px;
-      transform: translateY(1px);
+      // commented out for MLLR
+      // transform: translateY(1px);
     }
 
     input {

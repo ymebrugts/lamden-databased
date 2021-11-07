@@ -2,14 +2,24 @@
   <div class="background-transition-databased"></div>
   <div class="wrapper">
     <header class="header">
-      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== connectionRequest.contractName" @click="connectToWallet">
+      <button
+        class="button"
+        v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== connectionRequest.contractName"
+        @click="connectToWallet"
+      >
         CONNECT LAMDEN WALLET
       </button>
-      <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="button" v-if="walletIsInstalled === false"
+      <a
+        href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim"
+        target="_blank"
+        class="button"
+        v-if="walletIsInstalled === false && walletIsInstalled !== undefined"
         >WALLET NOT INSTALLED</a
       >
       <button class="button" v-if="walletController.locked === true">WALLET IS LOCKED</button>
-      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === connectionRequest.contractName">CONNECTED</button>
+      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === connectionRequest.contractName">
+        CONNECTED
+      </button>
     </header>
     <img alt="Databased logo" src="../assets/logo.png" class="logo" />
     <LogoText />
@@ -17,7 +27,7 @@
 
     <p class="slogan">
       <a href="https://rocketswap.exchange/#/swap/con_databased" class="link-databased" target="_blank">BUY</a> |
-      <a href="https://nebulamden.finance/" class="link-databased" target="_blank">STAKE</a> | TIP | RAIN
+      <a href="https://nebulamden.finance/" class="link-databased" target="_blank">STAKE</a> | FARM
     </p>
     <h2 class="subheading">
       What will your assets <br class="break" />
@@ -25,10 +35,13 @@
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <h2 class="slogan" v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === connectionRequest.contractName">
+    <h2
+      class="slogan"
+      v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === connectionRequest.contractName"
+    >
       You don't hold enough BASED you need to hold at least 10.000 BASED
     </h2>
-    <h2  class="slogan" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== connectionRequest.contractName">
+    <h2 class="slogan" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== connectionRequest.contractName">
       Connect to wallet to verify you hold at least 10.000 BASED
     </h2>
     <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="subheading" v-if="walletIsInstalled === false"
@@ -70,8 +83,8 @@ import { masternodeApi } from "@/api/masternodeApi";
 const connectionRequest = {
   appName: "Databased", // Your DAPPS's name
   version: "1.0.0", // any version to start, increment later versions to update connection info
-  logo: "/src/assets/databased.png", // or whatever the location of your logo
-  contractName: "con_databased", // Will never change
+  logo: "../src/assets/logo.png", // or whatever the location of your logo
+  contractName: "con_nebula", // Will never change
   networkType: "mainnet", // other option is 'mainnet'
 };
 
@@ -125,15 +138,16 @@ export default defineComponent({
     const handleTxResults = (txInfo: any) => handleTxResultsDatabased(txInfo);
     //Connect to event emitters
     walletController.events.on("newInfo", handleWalletInfo); // Wallet Info Events, including errors
+    walletController.events.on("lamdenWalletInfo", handleWalletInfo); // Wallet Info Events, including errors
     walletController.events.on("txStatus", handleTxResults); // Transaction Results
-    const walletIsInstalled = ref<boolean>();
+
+    document.addEventListener("lamdenWalletInfo", handleWalletInfo);
+
+    const walletIsInstalled = ref();
     const enoughBased = ref<boolean>(false);
-    const walletConnected = computed(() => {
-      const connectionStatus = walletIsInstalled.value;
-      return connectionStatus ? "Wallet connected" : "Connect Lamden Wallet";
-    });
 
     async function connectToWallet() {
+      console.log("connect to wallet");
       walletIsInstalled.value = await walletController.walletIsInstalled();
       if (!walletIsInstalled.value) {
         //TODO: global snackbar error
@@ -144,19 +158,22 @@ export default defineComponent({
       walletController.sendConnection(connectionRequest);
     }
 
-    onMounted(async () => {
+    onMounted(() => {
       setTimeout(() => {
         walletController.walletIsInstalled().then((installed: boolean) => {
           if (installed) walletIsInstalled.value = true;
           else walletIsInstalled.value = false;
-          
+          console.log("timeout");
+          console.log(installed);
+          console.log(walletIsInstalled.value);
         });
-      }, 1000);
+      }, 2000);
     });
 
     async function handleWalletInfoDatabased(walletInfo: any) {
-      updateWalletBalances(walletInfo);
       console.log(walletInfo);
+      console.log("here we go");
+      updateWalletBalances(walletInfo);
     }
 
     const walletBalances = ref<any>();
@@ -282,7 +299,18 @@ export default defineComponent({
 
     function handleTxResultsDatabased(txInfo: any) {}
 
-    return { walletConnected, walletIsInstalled, connectToWallet, walletController, currenciesToShow, marketTokens, supportedCurrencies, tauPrice, circulatingSupplies, enoughBased, connectionRequest };
+    return {
+      walletIsInstalled,
+      connectToWallet,
+      walletController,
+      currenciesToShow,
+      marketTokens,
+      supportedCurrencies,
+      tauPrice,
+      circulatingSupplies,
+      enoughBased,
+      connectionRequest,
+    };
   },
 });
 </script>
@@ -411,7 +439,7 @@ footer {
   background-color: black;
   position: absolute;
   top: 0;
-  height:100%;
+  height: 100%;
   left: 0;
   right: 0;
   z-index: 3;
