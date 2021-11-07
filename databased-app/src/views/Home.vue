@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted, ref, watch } from "vue";
+import { defineComponent, computed, onMounted, ref, watch, reactive } from "vue";
 import Calculator from "@/components/Calculator.vue";
 import LogoText from "@/components/LogoText.vue";
 import WalletController from "lamden_wallet_controller";
@@ -119,7 +119,7 @@ export default defineComponent({
   },
   setup() {
     // Wallet
-    const walletController = new WalletController();
+    const walletController = reactive(new WalletController());
     // Create event handlers
     const handleWalletInfo = (walletInfo: any) => handleWalletInfoDatabased(walletInfo);
     const handleTxResults = (txInfo: any) => handleTxResultsDatabased(txInfo);
@@ -154,7 +154,7 @@ export default defineComponent({
       if (walletController.locked === null) {
         walletController.locked = false;
       }
-      updateWalletBalances(walletInfo)
+      updateWalletBalances(walletInfo);
     }
 
     const walletBalances = ref<any>();
