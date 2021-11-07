@@ -160,7 +160,7 @@ export default defineComponent({
       if (walletController.locked === null) {
         walletController.locked = false;
       }
-      if (walletInfo.approvals.mainnet == "con_databased") {
+      if (walletInfo?.approvals?.mainnet == "con_databased") {
         updateWalletBalances(walletInfo);
       }
     }
