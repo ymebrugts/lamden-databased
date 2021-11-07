@@ -2,24 +2,14 @@
   <div class="background-transition-databased"></div>
   <div class="wrapper">
     <header class="header">
-      <button
-        class="button"
-        v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== connectionRequest.contractName"
-        @click="connectToWallet"
-      >
+      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== 'con_databased'" @click="connectToWallet">
         CONNECT LAMDEN WALLET
       </button>
-      <a
-        href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim"
-        target="_blank"
-        class="button"
-        v-if="walletIsInstalled === false && walletIsInstalled !== undefined"
+      <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="button" v-if="walletIsInstalled === false"
         >WALLET NOT INSTALLED</a
       >
       <button class="button" v-if="walletController.locked === true">WALLET IS LOCKED</button>
-      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === connectionRequest.contractName">
-        CONNECTED
-      </button>
+      <button class="button" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === 'con_databased'">CONNECTED</button>
     </header>
     <img alt="Databased logo" src="../assets/logo.png" class="logo" />
     <LogoText />
@@ -35,14 +25,11 @@
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
 
-    <h2
-      class="slogan"
-      v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === connectionRequest.contractName"
-    >
+    <h2 class="slogan" v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === 'con_databased'">
       You don't hold enough BASED you need to hold at least 10.000 BASED
     </h2>
-    <h2 class="slogan" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== connectionRequest.contractName">
-      Connect to wallet to verify you hold at least 10.000 BASED
+    <h2 class="slogan" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== 'con_databased'">
+      Connect to the wallet to verify you hold at least 10.000 BASED
     </h2>
     <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="subheading" v-if="walletIsInstalled === false"
       >Install wallet first</a
@@ -83,8 +70,8 @@ import { masternodeApi } from "@/api/masternodeApi";
 const connectionRequest = {
   appName: "Databased", // Your DAPPS's name
   version: "1.0.0", // any version to start, increment later versions to update connection info
-  logo: "../src/assets/logo.png", // or whatever the location of your logo
-  contractName: "con_nebula", // Will never change
+  logo: "img/logo.png", // or whatever the location of your logo
+  contractName: "con_databased", // Will never change
   networkType: "mainnet", // other option is 'mainnet'
 };
 
@@ -138,10 +125,7 @@ export default defineComponent({
     const handleTxResults = (txInfo: any) => handleTxResultsDatabased(txInfo);
     //Connect to event emitters
     walletController.events.on("newInfo", handleWalletInfo); // Wallet Info Events, including errors
-    walletController.events.on("lamdenWalletInfo", handleWalletInfo); // Wallet Info Events, including errors
     walletController.events.on("txStatus", handleTxResults); // Transaction Results
-
-    document.addEventListener("lamdenWalletInfo", handleWalletInfo);
 
     const walletIsInstalled = ref();
     const enoughBased = ref<boolean>(false);
@@ -173,7 +157,12 @@ export default defineComponent({
     async function handleWalletInfoDatabased(walletInfo: any) {
       console.log(walletInfo);
       console.log("here we go");
-      updateWalletBalances(walletInfo);
+      if (walletController.locked === null) {
+        walletController.locked = false;
+      }
+      if (walletInfo.approvals.mainnet == "con_databased") {
+        updateWalletBalances(walletInfo);
+      }
     }
 
     const walletBalances = ref<any>();
