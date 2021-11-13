@@ -12,7 +12,7 @@ export default defineComponent({
     
     setTimeout(function() {
       isAnimating.value = false;
-    }, 10000);
+    }, 4000);
 
     return {
       isAnimating

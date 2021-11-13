@@ -24,12 +24,12 @@
       be worth?<span>*</span>
     </h2>
     <p class="subheading-subtitle">Calculate The Value And MC Of Your Lamden Assets At Any Price.</p>
-
+<!-- 
     <h2 class="slogan" v-if="enoughBased == false && walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName === 'con_databased'">
       You don't hold enough BASED you need to hold at least 10.000 BASED
-    </h2>
+    </h2> -->
     <h2 class="slogan" v-if="walletIsInstalled === true && walletController.locked === false && walletController?.approvals?.mainnet?.contractName !== 'con_databased'">
-      Connect to the wallet to verify you hold at least 10.000 BASED
+      Connect to the wallet
     </h2>
     <a href="https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim" target="_blank" class="subheading" v-if="walletIsInstalled === false"
       >Install wallet first</a
@@ -157,15 +157,17 @@ export default defineComponent({
     const walletBalances = ref<any>();
     const currenciesToShow = ref<any>({});
     function checkBased(basedAmount: number) {
-      if (basedAmount !== undefined) {
-        if (basedAmount >= 10000) {
-          enoughBased.value = true;
-        } else {
-          enoughBased.value = false;
-        }
-      } else {
-        enoughBased.value = false;
-      }
+      // Commented till BASED is a requirement again
+      // if (basedAmount !== undefined) {
+      //   if (basedAmount >= 10000) {
+      //     enoughBased.value = true;
+      //   } else {
+      //     enoughBased.value = false;
+      //   }
+      // } else {
+      //   enoughBased.value = false;
+      // }
+      enoughBased.value = true;
     }
     async function updateWalletBalances(walletInfo: any) {
       // if wallet has current connected wallet
