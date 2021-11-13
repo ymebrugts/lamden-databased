@@ -66,6 +66,7 @@ import LogoText from "@/components/LogoText.vue";
 import WalletController from "lamden_wallet_controller";
 import { rocketSwapApi } from "@/api/rocketswapApi";
 import { masternodeApi } from "@/api/masternodeApi";
+import { tauHqApi } from "@/api/tauHqApi";
 
 const connectionRequest = {
   appName: "Databased", // Your DAPPS's name
@@ -208,21 +209,30 @@ export default defineComponent({
           const balance = await masternodeApi.getBalanceFromContract(contractName, address);
           // API response different for only TAU
           if (contractName === "currency") {
-            listOfBalancesToSubstract.push(balance.data.value);
+            const lostTau = await tauHqApi.getLostTau();
+            let totalLostTau = 0;
+            lostTau.data.forEach((row: any) => {
+              totalLostTau += Number(row.Balance)
+            });
+            let totalTauToSubstract = Number(balance.data.value.__fixed__)
+            if (!isNaN(totalLostTau)) {
+              totalTauToSubstract += totalLostTau;
+            }     
+            listOfBalancesToSubstract.push(totalTauToSubstract);
           } else {
             listOfBalancesToSubstract.push(balance.data.value.__fixed__);
           }
         })
       );
-
+      
       const circulatingSupply = substractSupplies(totalSupply, listOfBalancesToSubstract);
       return circulatingSupply;
     }
 
     function substractSupplies(totalSupply: number, listOfBalancesToSubstract: any) {
       let circulatingSupplyLocal = totalSupply;
-      listOfBalancesToSubstract.forEach((balance: number) => {
-        circulatingSupplyLocal = circulatingSupplyLocal - balance;
+      listOfBalancesToSubstract.forEach((balanceToSubstract: number) => {
+        circulatingSupplyLocal = circulatingSupplyLocal - balanceToSubstract;
       });
       return circulatingSupplyLocal;
     }
